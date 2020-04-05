@@ -1,0 +1,20 @@
+version: "3"
+services:
+  wallet-couchdb:
+    image: couchdb:latest
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=password
+    ports:
+      - "5984:5984"
+  wallet-api:
+    build: .
+    environment:
+      - PORT=3000
+      - COUCH_CONNECTION_URL=http://admin:password@wallet-couchdb:5984
+    depends_on:
+      - wallet-couchdb
+    links:
+      - wallet-couchdb
+    ports:
+      - "3000:3000"
