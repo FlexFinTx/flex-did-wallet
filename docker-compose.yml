@@ -10,11 +10,11 @@ services:
   wallet-api:
     build: .
     environment:
-      - PORT=3000
+      - PORT=5001
       - COUCH_CONNECTION_URL=http://admin:password@wallet-couchdb:5984
     depends_on:
       - wallet-couchdb
     links:
       - wallet-couchdb
     ports:
-      - "3000:3000"
+      - "5001:5001"
