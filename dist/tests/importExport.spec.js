@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
 require("mocha");
 var Wallet_1 = require("../Wallet");
-describe("export, lock, unlock", function () {
+describe("import export", function () {
     it("errors when exporting unlocked wallet", function () {
         var wallet = new Wallet_1.Wallet();
         try {
