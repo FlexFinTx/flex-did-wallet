@@ -59,7 +59,7 @@ router.get("/test", function (req, res) { return __awaiter(void 0, void 0, void 
                     data: {
                         keys: [
                             {
-                                type: "Ed25519VerificationKey2018",
+                                type: "assymetric",
                                 encoding: Wallet_1.Encodings.Base58,
                                 publicKey: keyOne.publicKeyBase58,
                                 privateKey: keyOne.privateKeyBase58,
@@ -67,7 +67,7 @@ router.get("/test", function (req, res) { return __awaiter(void 0, void 0, void 
                                 notes: "",
                             },
                             {
-                                type: "Ed25519VerificationKey2018",
+                                type: "assymetric",
                                 encoding: Wallet_1.Encodings.Base58,
                                 publicKey: keyTwo.publicKeyBase58,
                                 privateKey: keyTwo.privateKeyBase58,
@@ -82,7 +82,7 @@ router.get("/test", function (req, res) { return __awaiter(void 0, void 0, void 
                     type: "add-key",
                     password: "securePassword",
                     key: {
-                        type: "Ed25519VerificationKey2018",
+                        type: "assymetric",
                         encoding: Wallet_1.Encodings.Base58,
                         publicKey: addLaterKey.publicKeyBase58,
                         privateKey: addLaterKey.privateKeyBase58,
@@ -108,7 +108,7 @@ router.get("/test", function (req, res) { return __awaiter(void 0, void 0, void 
         }
     });
 }); });
-router.post("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+router.post("/create", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var walletManager, createWalletRequest, response;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -132,18 +132,23 @@ router.post("/", function (req, res) { return __awaiter(void 0, void 0, void 0, 
 router.get("/:id", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var walletManager, id, getWalletRequest, wallet;
     return __generator(this, function (_a) {
-        walletManager = req.app.get("walletManager");
-        id = req.params.id;
-        getWalletRequest = req.body;
-        wallet = walletManager.getWallet(id, getWalletRequest.password);
-        if (wallet) {
-            res.status(200).json(wallet);
-            return [2 /*return*/];
+        switch (_a.label) {
+            case 0:
+                walletManager = req.app.get("walletManager");
+                id = req.params.id;
+                getWalletRequest = req.body;
+                return [4 /*yield*/, walletManager.getWallet(id, getWalletRequest.password)];
+            case 1:
+                wallet = _a.sent();
+                if (wallet) {
+                    res.status(200).json(wallet);
+                    return [2 /*return*/];
+                }
+                res.status(400).json({
+                    error: "Invalid wallet id or password",
+                });
+                return [2 /*return*/];
         }
-        res.status(400).json({
-            error: "Invalid wallet id or password",
-        });
-        return [2 /*return*/];
     });
 }); });
 router.patch("/:id", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
@@ -160,9 +165,11 @@ router.patch("/:id", function (req, res) { return __awaiter(void 0, void 0, void
                 response = _a.sent();
                 if (response) {
                     res.status(200).json({ kid: response });
+                    return [2 /*return*/];
                 }
                 else {
                     res.status(400).json({ error: "Invalid key" });
+                    return [2 /*return*/];
                 }
                 return [3 /*break*/, 4];
             case 2:
@@ -172,12 +179,34 @@ router.patch("/:id", function (req, res) { return __awaiter(void 0, void 0, void
                 response = _a.sent();
                 if (response) {
                     res.status(200).json({ message: "Successfully removed key!" });
+                    return [2 /*return*/];
                 }
                 else {
                     res.status(400).json({ error: "Invalid kid" });
+                    return [2 /*return*/];
                 }
                 _a.label = 4;
             case 4:
+                res.status(400).json("Invalid request");
+                return [2 /*return*/];
+        }
+    });
+}); });
+router.post("/:id/sign", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var walletManager, id, signRequest, response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                walletManager = req.app.get("walletManager");
+                id = req.params.id;
+                signRequest = req.body;
+                return [4 /*yield*/, walletManager.sign(id, signRequest.password, signRequest.kid, signRequest.data)];
+            case 1:
+                response = _a.sent();
+                if (response) {
+                    res.status(200).json({ signature: response });
+                    return [2 /*return*/];
+                }
                 res.status(400).json("Invalid request");
                 return [2 /*return*/];
         }

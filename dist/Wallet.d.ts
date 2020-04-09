@@ -27,10 +27,11 @@ export interface AssymetricWalletKey {
 export declare class Wallet {
     ciphered: string;
     keys: _.Dictionary<AssymetricWalletKey>;
-    constructor(data: string | {
+    constructor(data?: string | {
         keys: AssymetricWalletKey[];
     });
     lock(password: string): void;
+    sign(kid: string, data: any): Promise<string>;
     addKey(key: AssymetricWalletKey): string;
     removeKey(kid: string): void;
     unlock(password: string): void;

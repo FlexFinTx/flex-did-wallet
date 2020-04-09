@@ -10,4 +10,5 @@ export declare class WalletManager {
     getWallet(id: string, password: string): Promise<_.Dictionary<AssymetricWalletKey>>;
     addKeyToWallet(id: string, password: string, key: AssymetricWalletKey): Promise<string>;
     removeKeyFromWallet(id: string, password: string, kid: string): Promise<boolean>;
+    sign(id: string, password: string, kid: string, data: any): Promise<string>;
 }

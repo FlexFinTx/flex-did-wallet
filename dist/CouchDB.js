@@ -56,9 +56,10 @@ var CouchDB = /** @class */ (function () {
                         return [4 /*yield*/, this._instance.db.create("wallets")];
                     case 2:
                         _a.sent();
-                        this._wallets = this._instance.use("wallets");
                         _a.label = 3;
-                    case 3: return [2 /*return*/];
+                    case 3:
+                        console.log("Initialized CouchDB");
+                        return [2 /*return*/];
                 }
             });
         });
@@ -66,14 +67,20 @@ var CouchDB = /** @class */ (function () {
     CouchDB.prototype.insert = function (doc) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this._wallets.insert(doc)];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._instance.use("wallets").insert(doc)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
             });
         });
     };
     CouchDB.prototype.get = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this._wallets.get(id)];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._instance.use("wallets").get(id)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
             });
         });
     };

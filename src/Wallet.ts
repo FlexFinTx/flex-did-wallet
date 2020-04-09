@@ -33,15 +33,15 @@ export interface AssymetricWalletKey {
 
 export class Wallet {
   ciphered: string;
-  keys: _.Dictionary<AssymetricWalletKey>;
+  keys: _.Dictionary<AssymetricWalletKey> = {};
 
-  constructor(data: string | { keys: AssymetricWalletKey[] }) {
+  constructor(data?: string | { keys: AssymetricWalletKey[] }) {
     if (typeof data === "string") {
       this.ciphered = data;
       return;
     }
 
-    if (data.keys) {
+    if (data && data.keys) {
       const mappedKeys = data.keys.map((k) => {
         if (k.type != "assymetric") {
           throw new Error("Unsupported key type");
@@ -85,16 +85,16 @@ export class Wallet {
     const options = {
       privateKeyBase58: keyToUse.privateKey,
       publicKeyBase58: keyToUse.publicKey,
-    }
+    };
 
     const toBeSignedHash = crypto
-    .createHash("sha256")
-    .update(Buffer.from(data))
-    .digest();
+      .createHash("sha256")
+      .update(Buffer.from(data))
+      .digest();
 
     const keyPair = await Ed25519KeyPair.from(options);
     const signer = keyPair.signer();
-    const signature = await signer.sign({data: toBeSignedHash});
+    const signature = await signer.sign({ data: toBeSignedHash });
     const encodedSignature = base64url.encode(signature);
     return encodedSignature;
   }

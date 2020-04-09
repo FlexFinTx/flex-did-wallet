@@ -14,3 +14,8 @@ export interface PatchWalletRequest {
     kid?: string;
     key?: AssymetricWalletKey;
 }
+export interface SignRequest {
+    password: string;
+    kid: string;
+    data: string;
+}

@@ -167,6 +167,34 @@ var WalletManager = /** @class */ (function () {
             });
         });
     };
+    WalletManager.prototype.sign = function (id, password, kid, data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var walletEntryDoc, walletEntry, compare, wallet, signature;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.couch.get(id)];
+                    case 1:
+                        walletEntryDoc = _a.sent();
+                        if (!walletEntryDoc) return [3 /*break*/, 3];
+                        walletEntry = WalletEntry_1.WalletEntry.fromObject(walletEntryDoc);
+                        return [4 /*yield*/, bcrypt.compare(password, walletEntry.hashedPassword)];
+                    case 2:
+                        compare = _a.sent();
+                        if (!compare)
+                            return [2 /*return*/, ""];
+                        wallet = new Wallet_1.Wallet(walletEntry.cipheredKeys);
+                        wallet.unlock(password);
+                        signature = wallet.sign(kid, data);
+                        wallet.lock(password);
+                        if (signature) {
+                            return [2 /*return*/, signature];
+                        }
+                        _a.label = 3;
+                    case 3: return [2 /*return*/, ""];
+                }
+            });
+        });
+    };
     return WalletManager;
 }());
 exports.WalletManager = WalletManager;
