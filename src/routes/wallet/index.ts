@@ -74,80 +74,105 @@ router.get("/test", async (req: express.Request, res: express.Response) => {
 router.post("/create", async (req: express.Request, res: express.Response) => {
   const walletManager = req.app.get("walletManager") as WalletManager;
   const createWalletRequest = req.body as CreateWalletRequest;
-  const response = await walletManager.createNewWalletWithKeys(
-    createWalletRequest.data,
-    createWalletRequest.password
-  );
-  if (response) {
-    res.status(200).json({ id: response });
-    return;
+  try {
+    const response = await walletManager.createNewWalletWithKeys(
+      createWalletRequest.data,
+      createWalletRequest.password
+    );
+    if (response) {
+      res.status(200).json({ id: response });
+      return;
+    }
+  } catch (e) {
+    res.status(400).json({
+      error: "Something went wrong trying to create your wallet",
+      message: e.message,
+    });
   }
-  res.status(500).json({
-    error: "Something went wrong trying to create your wallet",
-  });
 });
 
 router.get("/:id", async (req: express.Request, res: express.Response) => {
   const walletManager = req.app.get("walletManager") as WalletManager;
   const id = req.params.id as string;
   const getWalletRequest = req.body as GetWalletRequest;
-  const wallet = await walletManager.getWallet(id, getWalletRequest.password);
-  if (wallet) {
-    res.status(200).json(wallet);
-    return;
+  try {
+    const wallet = await walletManager.getWallet(id, getWalletRequest.password);
+    if (wallet) {
+      res.status(200).json(wallet);
+      return;
+    }
+  } catch (e) {
+    res.status(400).json({
+      error: "Invalid wallet id or password",
+      message: e.message,
+    });
   }
-
-  res.status(400).json({
-    error: "Invalid wallet id or password",
-  });
 });
 
 router.patch("/:id", async (req: express.Request, res: express.Response) => {
   const walletManager = req.app.get("walletManager") as WalletManager;
   const id = req.params.id as string;
   const patchWalletRequest = req.body as PatchWalletRequest;
-  if (patchWalletRequest.type === "add-key") {
-    const response = await walletManager.addKeyToWallet(
-      id,
-      patchWalletRequest.password,
-      patchWalletRequest.key
-    );
-    if (response) {
-      res.status(200).json({ kid: response });
-      return;
-    } else {
-      res.status(400).json({ error: "Invalid key" });
-      return;
+  try {
+    if (patchWalletRequest.type === "add-key") {
+      const response = await walletManager.addKeyToWallet(
+        id,
+        patchWalletRequest.password,
+        patchWalletRequest.key
+      );
+      if (response) {
+        res.status(200).json({ kid: response });
+        return;
+      } else {
+        res.status(400).json({ error: "Invalid key" });
+        return;
+      }
+    } else if (patchWalletRequest.type === "remove-key") {
+      const response = await walletManager.removeKeyFromWallet(
+        id,
+        patchWalletRequest.password,
+        patchWalletRequest.kid
+      );
+      if (response) {
+        res.status(200).json({ message: "Successfully removed key!" });
+        return;
+      } else {
+        res.status(400).json({ error: "Invalid kid" });
+        return;
+      }
     }
-  } else if (patchWalletRequest.type === "remove-key") {
-    const response = await walletManager.removeKeyFromWallet(
-      id,
-      patchWalletRequest.password,
-      patchWalletRequest.kid
-    );
-    if (response) {
-      res.status(200).json({ message: "Successfully removed key!" });
-      return;
-    } else {
-      res.status(400).json({ error: "Invalid kid" });
-      return;
-    }
+  } catch (e) {
+    res.status(400).json({
+      error: "Invalid request",
+      message: e.message,
+    });
   }
-
-  res.status(400).json("Invalid request");
 });
 
-router.post("/:id/sign", async (req: express.Request, res: express.Response) => {
-  const walletManager = req.app.get("walletManager") as WalletManager;
-  const id = req.params.id as string;
-  const signRequest = req.body as SignRequest;
-  const response = await walletManager.sign(id, signRequest.password, signRequest.kid, signRequest.data);
-  if (response) {
-    res.status(200).json({signature: response})
-    return;
+router.post(
+  "/:id/sign",
+  async (req: express.Request, res: express.Response) => {
+    const walletManager = req.app.get("walletManager") as WalletManager;
+    const id = req.params.id as string;
+    const signRequest = req.body as SignRequest;
+    try {
+      const response = await walletManager.sign(
+        id,
+        signRequest.password,
+        signRequest.kid,
+        signRequest.data
+      );
+      if (response) {
+        res.status(200).json({ signature: response });
+        return;
+      }
+    } catch (e) {
+      res.status(400).json({
+        error: "Invalid kid or password",
+        message: e.message,
+      });
+    }
   }
-
-  res.status(400).json("Invalid request")
-})
+);
 
 export = router;
